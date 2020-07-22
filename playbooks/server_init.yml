@@ -1,0 +1,10 @@
+---
+- name: Multiplay Game Server Init - China
+  hosts: all
+  gather_facts: False
+  strategy: free
+  connection: ssh
+  remote_user: root
+  tasks:
+    - name: print
+      shell: hostname
