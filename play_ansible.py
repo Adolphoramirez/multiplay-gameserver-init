@@ -21,6 +21,11 @@ def gen_ssh_key(ssh_key_file):
     return ssh_key_file
 
 def machine_init(machine, fleet_id):
+    if type(machine) is str:
+        inventory = machine + ","
+    if type(machine) is list:
+        inventory = ",".join(machine) + ","
+
     ansible = RunPlaybook(private_key_file=gen_ssh_key("ssh_key.pem"))
     ansible.run(
         inventory=inventory,
