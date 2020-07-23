@@ -6,12 +6,6 @@ import os
 import base64
 from AnsiblePlaybook import RunPlaybook
 
-request_resource = {
-    "gameserver": {
-        "machine_init": {},
-    },
-}
-
 
 def gen_ssh_key(ssh_key_file):
     ansible_ssh_key_raw = os.environ["ANSIBLE_SSH_KEY"]
@@ -40,20 +34,16 @@ def main_handler(event, content):
         return {"errorCode": 410, "errorMsg":"event is not come from api gateway"}
 
     # Check if the request is valid
-    request_list = event["requestContext"]["path"].split("/")
-    if request_list[0] not in request_resource.keys() or \
-       request_list[1] not in request_resource[request_list[0]].keys():
+    if event["requestContext"]["path"] != "/gameserver"
         return {"errorCode": 411, "errorMsg":"request is not from setting api path"}
 
-    if request_list[0] == "gameserver":
-        if request_list[1] == "machine_init" and \
-           event["requestContext"]["httpMethod"] == "POST":
-            try:
-                body = json.loads(event["body"])
-                machine = body["machine"]
-                fleet_id = body["fleet_id"]
-            except Exception as e:
-                print("Failed to parse the body: {}".format(event["body"]))
-            machine_init_result = machine_init(machine=machine, fleet_id=fleet_id)
+        try:
+            body = json.loads(event["body"])
+            machine = body["machine"]
+            fleet_id = body["fleet_id"]
+        except Exception as e:
+            print("Failed to parse the body: {}".format(event["body"]))
+            return {"errorCode": 413, "errorMsg":"request is not correctly execute"}
+        machine_init_result = machine_init(machine=machine, fleet_id=fleet_id)
 
     return {"errorCode": 413, "errorMsg":"request is not correctly execute"}
